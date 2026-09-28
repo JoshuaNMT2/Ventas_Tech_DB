@@ -15,6 +15,7 @@ DROP TABLE IF EXISTS ventas;
 DROP TABLE IF EXISTS productos;
 DROP TABLE IF EXISTS clientes;
 DROP TABLE IF EXISTS categorias;
+DROP TABLE IF EXISTS regiones;
 
 -- ============================================================
 -- Paso 2b: CREATE TABLES
@@ -25,12 +26,22 @@ CREATE TABLE categorias (
     descripcion      VARCHAR(200)
 );
 
+-- Tabla regiones — agregada en el Módulo 5: dimensión geográfica que
+-- faltaba en el esquema, para poder mostrar una columna descriptiva
+-- extra al hacer JOIN en la pre-entrega de M5.
+CREATE TABLE regiones (
+    id_region     INT PRIMARY KEY,
+    nombre_region VARCHAR(50) NOT NULL
+);
+
 CREATE TABLE clientes (
     id_cliente     INT PRIMARY KEY,
     nombre         VARCHAR(100) NOT NULL,
     email          VARCHAR(100) UNIQUE,
     ciudad         VARCHAR(50),
-    fecha_registro DATE NOT NULL
+    fecha_registro DATE NOT NULL,
+    id_region      INT,
+    FOREIGN KEY (id_region) REFERENCES regiones(id_region)
 );
 
 CREATE TABLE productos (
@@ -64,20 +75,30 @@ INSERT INTO categorias VALUES (2, 'Accesorios', 'Periféricos y complementos');
 INSERT INTO categorias VALUES (3, 'Audio', 'Auriculares y parlantes');
 INSERT INTO categorias VALUES (4, 'Almacenamiento', 'Discos y memorias');
 
--- clientes (5 registros)
-INSERT INTO clientes VALUES (1, 'María López',  'maria@mail.com',  'Buenos Aires', '2024-01-05');
-INSERT INTO clientes VALUES (2, 'Carlos Ruiz',  'carlos@mail.com', 'Córdoba',      '2024-01-10');
-INSERT INTO clientes VALUES (3, 'Ana Gómez',    'ana@mail.com',    'Rosario',      '2024-02-01');
-INSERT INTO clientes VALUES (4, 'Pedro Sanz',   'pedro@mail.com',  'Mendoza',      '2024-02-15');
-INSERT INTO clientes VALUES (5, 'Laura Torres', 'laura@mail.com',  'Tucumán',      '2024-03-01');
+-- regiones (4 registros, agregados en M5)
+INSERT INTO regiones VALUES (1, 'Centro');
+INSERT INTO regiones VALUES (2, 'Litoral');
+INSERT INTO regiones VALUES (3, 'Cuyo');
+INSERT INTO regiones VALUES (4, 'Noroeste');
 
--- productos (6 registros)
+-- clientes (6 registros: los 5 originales + 1 nuevo sin ventas, para
+-- poder probar la Consulta 2 de M5 con un resultado real)
+INSERT INTO clientes VALUES (1, 'María López',  'maria@mail.com',  'Buenos Aires', '2024-01-05', 1);
+INSERT INTO clientes VALUES (2, 'Carlos Ruiz',  'carlos@mail.com', 'Córdoba',      '2024-01-10', 1);
+INSERT INTO clientes VALUES (3, 'Ana Gómez',    'ana@mail.com',    'Rosario',      '2024-02-01', 2);
+INSERT INTO clientes VALUES (4, 'Pedro Sanz',   'pedro@mail.com',  'Mendoza',      '2024-02-15', 3);
+INSERT INTO clientes VALUES (5, 'Laura Torres', 'laura@mail.com',  'Tucumán',      '2024-03-01', 4);
+INSERT INTO clientes VALUES (6, 'Roberto Díaz', 'roberto@mail.com','Salta',        '2024-03-20', 4);
+
+-- productos (7 registros: los 6 originales + 1 nuevo sin ventas, para
+-- poder probar la Consulta 3 de M5 con un resultado real)
 INSERT INTO productos VALUES (1, 'Laptop Pro 15',      1, 1200.00, 15, 1);
 INSERT INTO productos VALUES (2, 'Mouse Inalámbrico',  2,   28.00, 80, 1);
 INSERT INTO productos VALUES (3, 'Monitor 4K 27"',     1,  450.00, 12, 1);
 INSERT INTO productos VALUES (4, 'Auriculares BT Pro', 3,  120.00, 35, 1);
 INSERT INTO productos VALUES (5, 'SSD Externo 1TB',    4,  130.00, 18, 1);
 INSERT INTO productos VALUES (6, 'Teclado Mecánico',   2,   95.00, 40, 1);
+INSERT INTO productos VALUES (7, 'Cargador USB-C',     2,   45.00, 60, 1);
 
 -- ventas (10 registros) 
 INSERT INTO ventas VALUES (1,  1, 1, 2, 1200.00, '2024-03-05');
@@ -95,6 +116,7 @@ INSERT INTO ventas VALUES (10, 5, 3, 2,  450.00, '2024-03-15');
 -- Paso 3: Verificación de integridad
 -- ============================================================
 SELECT * FROM categorias;
+SELECT * FROM regiones;
 SELECT * FROM clientes;
 SELECT * FROM productos;
 SELECT * FROM ventas;
